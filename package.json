@@ -1,7 +1,7 @@
 {
   "name": "battlelog-query-lambda",
   "version": "1.0.0",
-  "description": "A lightweight Lambda function to search for a player name on Battlelog",
+  "description": "A lightweight Lambda function to search for a player on Battlelog by name",
   "private": true,
   "main": "app.js",
   "author": "cetteup <me@cetteup.com>",
