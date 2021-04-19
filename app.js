@@ -7,17 +7,16 @@ exports.lambdaHandler = async (event) => {
         headers: { 'Content-Type': 'application/json' }
     };
 
-    // Try to fetch data from cache or source
     try {
-        // Make sure a channel name has been provided
+        // Make sure a player name has been provided
         if (!event?.queryStringParameters?.nick) {
             response.statusCode = 422;
             throw new Error('No/invalid player nick provided');
         }
 
+        // Remove trailing/leading whitespaces from name, convert to lower case and escape underscores
+        // (Battlelog uses underscores as wildcard characters for the user search)
         const playerName = event.queryStringParameters.nick.trim().toLowerCase().replace(/_/g, '\\_');
-
-
 
         const params = new URLSearchParams();
         params.append('query', playerName);
