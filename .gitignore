@@ -86,3 +86,7 @@ typings/
 
 # DynamoDB Local files
 .dynamodb/
+
+# Lambda artifacts
+bootstrap
+function.zip
