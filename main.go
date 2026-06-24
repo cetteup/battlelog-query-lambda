@@ -14,6 +14,7 @@ import (
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
+	"github.com/rs/zerolog"
 	"github.com/rs/zerolog/log"
 )
 
@@ -31,7 +32,7 @@ func init() {
 			Msg("Failed to authenticate user")
 	}
 
-	log.Info().Msgf("Authenticated as %s", user.Username)
+	log.Info().Msgf("Authenticated as %q", user.Username)
 
 	handler = NewHandler(user)
 }
@@ -51,6 +52,12 @@ func NewHandler(user *User) *Handler {
 }
 
 func (h *Handler) HandleRequest(ctx context.Context, req events.APIGatewayV2HTTPRequest) (events.APIGatewayV2HTTPResponse, error) {
+	ctx = log.Logger.Level(zerolog.InfoLevel).With().
+		Str("requestID", req.RequestContext.RequestID).
+		Str("remote", req.RequestContext.HTTP.SourceIP).
+		Logger().WithContext(ctx)
+
+	// API gateway should ensure this never happens
 	if req.RequestContext.HTTP.Method != http.MethodGet {
 		return events.APIGatewayV2HTTPResponse{
 			StatusCode: http.StatusMethodNotAllowed,
@@ -72,9 +79,11 @@ func (h *Handler) HandleRequest(ctx context.Context, req events.APIGatewayV2HTTP
 		}, nil
 	}
 
+	log.Ctx(ctx).Info().Msgf("Searching for %q", nick)
+
 	b, err := h.search(ctx, nick)
 	if err != nil {
-		log.Error().
+		log.Ctx(ctx).Error().
 			Err(err).
 			Msg("Failed to search for player")
 
